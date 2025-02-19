@@ -1,4 +1,42 @@
-# SpecuLoRA
+# 🚀 SpecuLoRA: Speeding Up LLM Inference with Domain-Specialized Speculative Decoding
+
+## 🌟 Introduction  
+**SpecuLoRA** is an advanced framework that accelerates large language model (LLM) inference by combining **speculative decoding** with **domain-specialized LoRA adapters**. By dynamically selecting LoRA adapters optimized for specific domains (Medical, Coding, Education, etc.), SpecuLoRA enhances token acceptance rate (TAR), reduces latency, and **significantly boosts throughput** during text generation.  
+
+Traditional speculative decoding employs a single draft model to propose token completions, which are then verified by a larger target model. SpecuLoRA improves on this by introducing:  
+- 🧠 **Domain-Specific LoRA Adapters:** Assistant models finetuned for specific domains/tasks
+- 🔍 **Router Model (FNN):** Predicts the most relevant **LoRA adapter** based on input queries  
+- 🚀 **Speculative Decoding Pipeline:** Combines the **draft model** with the selected **LoRA adapter** to generate high-confidence token completions efficiently  
+
+---
+
+## 🔥 **Why SpecuLoRA?**  
+SpecuLoRA addresses key inefficiencies in **speculative decoding** by:  
+- ✅ **Boosting Efficiency:** Higher **token acceptance rate (TAR)** reduces redundant computations  
+- ⏱️ **Lowering Latency:** Faster generation speeds with **domain-aware assistant models**  
+- 💡 **Reducing Memory Overhead:** LoRA adapters allow efficient fine-tuning without full model retraining  
+
+---
+
+## ⚙️ **How It Works**  
+### **1️⃣ Model Components**  
+- **Draft Model (`meta-llama/Llama-3.2-3B-Instruct`):** A smaller model equipped with **LoRA adapters** for different domains  
+- **Target Model (`meta-llama/Llama-3.2-8B-Instruct`):** The main model used in **speculative decoding** to verify the **assistant model's outputs**  
+- **LoRA Adapters:**  
+  - 🩺 `Medical LoRA Adapter`: Fine-tuned on medical queries  
+  - 🧑‍💻 `Python LoRA Adapter`: Fine-tuned on Python programming Q&A  
+  - 🎓 `Educational LoRA Adapter`: Fine-tuned on educational questions  
+- **Router Model (`FNN`):** Uses **CountVectorizer** and a lightweight **feedforward network** to predict the **best LoRA adapter**  
+
+### **2️⃣ Speculative Decoding Pipeline**  
+1. **Router selects the best LoRA adapter** for the given query  
+2. **Draft model + LoRA adapter** generates candidate completions  
+3. **Target model verifies tokens**; accepted tokens are finalized, and rejected ones are recomputed  
+4. **Final text output is produced**, along with **latency and throughput metrics**  
+
+---
+
+## 🚀 **Quickstart** 
 
 There are 3 main jupyter notebooks in our git repository. Below is a description of what each of these notebooks accomplishes.
 
@@ -6,7 +44,7 @@ There are 3 main jupyter notebooks in our git repository. Below is a description
 2) `Adapter.ipynb` is an example notebook of how we trained our medical and python LoRA adapters. This notebook namely looks at the medical dataset/adapter
 3) `Inference.ipynb` is our main notebook that runs our pipeline end to end. This runs inference on a list of queries and outputs analysis such as the throughput with/without LoRA adapters
 
-## Installation / Set Up 
+### Installation / Set Up 
 
 We have included a `requirements.txt` file that can be used to download all relevant packages needed to run our notebooks. We recommend the use of a virtual environment if the notebooks are going to be run locally. Note all of the experiments we ran were hosted on google colab so package management was handled for us. Follow the steps listed below for package installation:
 
@@ -19,11 +57,11 @@ We have included a `requirements.txt` file that can be used to download all rele
 
 The other main component needed to run our code is a Hugging Face account. All of the pretrained models that we use are loaded in from Hugging Face so it is required that the user has their own account and user access token. More can be read about user access tokens here: https://huggingface.co/docs/hub/en/security-tokens. Once you have located your user access token, simply paste it at the beginning of the `Adapter.ipynb` and `Inference.ipynb` notebooks. The HUGGING_FACE_TOKEN has purposefully been left blank in both of these notebooks to be filled in by the user. 
 
-## Training
+### Training
 
 There are two training notebooks that we used to create our pipeline. This section will summarize these notebooks at a high level. 
 
-### `Router.ipynb`
+#### `Router.ipynb`
 
 As discussed in the paper, the router is a simple feed forward neural network that is used to deduce which router the given query should be sent to. This notebook is straightforward and easy to adapt to your specific needs. The general logic flow of the notebook is listed below:
 
@@ -37,7 +75,7 @@ As discussed in the paper, the router is a simple feed forward neural network th
 
 The router notebook can be run end to end assuming the package installation steps were run without any other interventions.
 
-### `Adapter.ipynb`
+#### `Adapter.ipynb`
 
 This notebook serves as an example of how to train a LoRA adapter on your specific task or domain. As noted in the file, we test this specifically on the medical dataset and create a medical adapter. The general logic flow of the notebook is listed below:
 
@@ -51,7 +89,7 @@ This notebook serves as an example of how to train a LoRA adapter on your specif
 
 The adapter training notebook can be run end to end with package installation and the integration of the Hugging Face token. 
 
-## Inference
+### Inference
 
 Finally, we have the inference notebook which displays our whole end to end system. This notebook serves as an example use case of the pipeline we built. The notebooks takes in a list of queries that are specific to the LoRA adapters the user trained and performs analysis on the difference between the SpecuLoRA framework and normal speculative decoding. The general logic flow of the notebook is listed below:
 
@@ -68,6 +106,15 @@ Finally, we have the inference notebook which displays our whole end to end syst
 
 The inference notebook can be run end to end with package installation and the integration of the Hugging Face token. 
 
-## Summary
+### Summary
 
 We have provided three notebooks that define the SpecuLoRA pipeline that is discussed in our final report. Note we condensed the code found in these notebooks to make them more readable and easy to run. There were many failed experiments that we purposefully omitted to ensure that our repository contained only essential and executable code. Please note that we ran all of our experiments on Colab Pro which enabled us to have compute resources that were required to load in an 8B parameter model. Running these notebooks on a non GPU device is not feasible especially if the user is interested in training their own adapters. With these considerations, it is also possible to sub out the models and adapters we used to ones that are much smaller if the user is interested in running the pipeline with less compute requirements. 
+
+---
+
+## 🏆 Contributors
+
+- Vatsal Joshi, M.S. University of Michigan ([link](https://github.com/jvatsal21))
+- Omkar Yadav, M.S. University of Michigan ([link](https://github.com/omkar-yadav-12))
+- Lohit Kamatham, M.S. University of Michigan ([link](https://github.com/lohitk1))
+
